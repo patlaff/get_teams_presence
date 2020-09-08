@@ -1,0 +1,5 @@
+pyperclip>=1.6.0
+requests>=2.18.4
+msal>=1.4.3
+azure-servicebus>=0.50.3
+sense-hat>=2.2.0

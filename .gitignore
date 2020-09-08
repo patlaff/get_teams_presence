@@ -1,0 +1,10 @@
+config.json
+token_cache.bin
+presence.log
+pyvenv.cfg
+.git/
+bin/
+include/
+lib/
+__pycache__/
+share/
