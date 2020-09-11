@@ -4,6 +4,8 @@ This script will get the signed in users current "Presence" (as defined by Teams
 
 This particular "do some action" is to scroll a message across the LCD screen on an installed [Sense Hat](https://www.raspberrypi.org/products/sense-hat/)
 
+![End Result](img/endResult.GIF)
+
 # Prerequisites
 
 1. First, install the required packages using `pip3 install requirements.txt`
