@@ -15,14 +15,12 @@ from sense_hat import SenseHat
 
 logging.basicConfig(filename='presence.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-#import config
+# Import config
 config = json.load(open('config.json'))
 
 # Sense Hat stuff:
 sense = SenseHat()
 sense.low_light = True
-red = (255,0,0)
-blue = (0,0,255)
 timer = 56
 start_time = time.time()
 elapsed_time = 0
@@ -36,7 +34,7 @@ atexit.register(lambda:
     if cache.has_state_changed else None
     )
 
-# Establish GRAPH connection
+# Establish GRAPH connection via MSAL auth library
 app = msal.PublicClientApplication(
     config['client_id'], 
     authority=config['authority'],
@@ -48,10 +46,10 @@ result = None
 # We now check the cache to see if we have some end users signed in before.
 accounts = app.get_accounts()
 if accounts:
-    #logging.info('Account in cache: %s',accounts[0]['username'])
-    chosen = accounts[0]
+    # Assume only one account and get first one
+    account = accounts[0]
     # Now let's try to find a token in cache for this account
-    result = app.acquire_token_silent(config['scope'], account=chosen)
+    result = app.acquire_token_silent(config['scope'], account=account)
 
 # If no accounts with valid token found in cache, prompt user to log in again and get new
 if not result:
@@ -63,24 +61,32 @@ if not result:
         logging.error(e)
         raise ValueError(e)
     else:
+        # If [email] is included in config file, go through Azure SB/LA notification flow
         if config['email']:
             msg = {}
-            msg['message'] = f'Auth Token for {sys.argv[0]} on {socket.gethostname()} is not valid or unavailable. Please follow the link below and paste in the following code to generate a new token.'
+            msg['message'] = (
+                f'Auth Token for {sys.argv[0]} on {socket.gethostname()} is not valid or unavailable. '
+                'Please follow the link below and paste in the following code to generate a new token.'
+            )
             msg['email'] = config['email']
             msg['user_code'] = flow['user_code']
             msg['verification_uri'] = flow['verification_uri']
             msg_formatted = str(json.dumps(msg))
             message = Message(msg_formatted)
             try:
-                queue_client = QueueClient.from_connection_string(f"Endpoint=sb://lafferty-notification-hub.servicebus.windows.net/;SharedAccessKeyName={config['sb_queue_policy']};SharedAccessKey={config['sb_sakey']};EntityPath={config['sb_queue']}")
+                queue_client = QueueClient.from_connection_string(config['sb_conn_string'])
                 queue_client.send(message)
                 logging.info('Message sent to SB Queue successfully - check email for auth code.')
             except Exception as e:
                 logging.info(f'Error sending message to SB Queue : {e}')
+        # If [email] not included in config file, assume user will manually intervene on device, and open browser
         else:
             pyperclip.copy(flow['user_code']) # copy user code to clipboard
             webbrowser.open(flow['verification_uri']) # open browser
-            logging.info('The code %s has been copied to your clipboard, and your web browser is opening %s. Paste the code to sign in.', flow['user_code'], flow['verification_uri'])
+            logging.info(
+                'The code %s has been copied to your clipboard, and your web browser is opening %s. '
+                'Paste the code to sign in.', flow['user_code'], flow['verification_uri']
+            )
 
     result = app.acquire_token_by_device_flow(flow) 
 
@@ -89,7 +95,6 @@ if 'access_token' in result:
     graph_data = requests.get(  # Use token to call downstream service
         config['endpoint'],
         headers={'Authorization': 'Bearer ' + result['access_token']},).json()
-    #print('Graph API call result: %s' % json.dumps(graph_data, indent=2))
 else:
     logging.error(result.get('error'))
     logging.error(result.get('error_description'))
@@ -97,13 +102,12 @@ else:
 
 # Parse Graph Response to get current User Activity
 presence = graph_data['activity']
-#logging.info('Activity : %s',presence)
 
 # Activate lights on attached Sense Hat, and loop until next cron run
 # Cron Schedule : * * * * *
-if presence == 'InACall' or presence == 'InAConferenceCall':
+if presence in ['InACall', 'InAConferenceCall', 'Presenting']:
     while elapsed_time < timer:
-        sense.show_message('On Air', text_colour=blue, scroll_speed=0.2)
+        sense.show_message('On Air', text_colour=(0,0,255), scroll_speed=0.2)
         current_time = time.time()
         elapsed_time = current_time - start_time
 else:
