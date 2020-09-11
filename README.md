@@ -51,11 +51,17 @@ If the user needs a method of being notified of an expired or invalid auth token
 
 Templates for both of the required resources are included in this repo under the `Azure` folder. Configuration instructions are included further down this README.
 
-# Configuring Re-Authentication Notifications
+# Configuring Re-Authentication Notifications - 
+
+## DIY Method:
 
 1. [Create a Service Bus Namespace and Queue](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal)
 2. [Create a Logic App with Service Bus Trigger](https://docs.microsoft.com/en-us/azure/connectors/connectors-create-api-servicebus) (Follow steps in linked article UP TO "Add Service Bus Action" - you only need a service bus trigger, not the action)
 3. 
+
+## AzureRM Template Method
+
+
 
 # Built With
 * Python 3.7

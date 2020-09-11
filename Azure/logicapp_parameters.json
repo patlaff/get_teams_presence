@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "logicAppName": {
+        "value": "Lafferty-Notification-LogicApp"
+      },
+      "When_a_message_is_received_in_a_queue_(auto-complete)Frequency": {
+        "value": "Minute"
+      },
+      "When_a_message_is_received_in_a_queue_(auto-complete)Interval": {
+        "value": 1
+      },
+      "owner_Tag": {
+        "value": "Patrick Lafferty"
+      },
+      "office365_name": {
+        "value": "office365"
+      },
+      "office365_displayName": {
+        "value": "patrick.lafferty@slalom.com"
+      },
+      "servicebus_name": {
+        "value": "servicebus"
+      },
+      "servicebus_displayName": {
+        "value": "Lafferty-Notification-Queue"
+      },
+      "servicebus_namespace_name": {
+        "value": "REPLACE__servicebus_namespace"
+      },
+      "servicebus_resourceGroupName": {
+        "value": "REPLACE__servicebus_rg"
+      },
+      "servicebus_accessKey_name": {
+        "value": "RootManageSharedAccessKey"
+      }
+    }
+  }
+  
