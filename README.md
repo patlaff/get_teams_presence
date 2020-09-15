@@ -10,7 +10,7 @@ This particular "do some action" is to scroll a message across the LCD screen on
 
 1. First, install the required packages using `pip3 install requirements.txt`
 
-    * Some users may have difficulty installing the `azure-servicebus` package.  This is often a result of non-native support for UAMQP on Raspbian.  Installing the packages called out in the [UAMQP pypi page](https://pypi.org/project/uamqp/) should resolve the issue.
+    * Some users may have difficulty installing the `azure-servicebus` package.  This is often a result of non-native support for UAMQP on Raspbian.  Installing the packages called out in the [UAMQP pypi page](https://pypi.org/project/uamqp/) should resolve the issue
 
     * Alternatively, if you don't plan on setting up Azure infrastructure for supplying an email notification, simply remove azure-servicebus from requirements.txt. It is not needed in this case.
 
@@ -19,24 +19,14 @@ This particular "do some action" is to scroll a message across the LCD screen on
     * Select "Mobile & Desktop Apps" under Platform Settings
     * Navigate to the "API Permissions" blade, click "Add a permission", and under "Microsoft Graph", find and select "Presence.Read", then click "Add permissions"
 
-3. Create a config.json file with the following structure, filling in the empty attributes (if you don't plan on setting up Azure infrastructure, remove `email` and `sb_conn_string`):
-```
-{
-    "authority": "https://login.microsoftonline.com/common",
-    "client_id": "",
-    "scope": ["Presence.Read Presence.Read.All"],
-    "endpoint": "https://graph.microsoft.com/beta/me/presence",
-    "email": "",
-    "sb_conn_string": ""
-}
-```
+3. Update `Azure/config.json` with the `client_id` captured in step 2
 
-Here is an example:
+Here is an example of how config.json should look (NOTE: If generating Azure infrastructure, `deployment_script.ps1` will automatically generate `email` and `sb_conn_string` attributes):
 ```
 {
     "authority": "https://login.microsoftonline.com/common",
     "client_id": "00000000-1111-2222-3333-444444444444",
-    "scope": ["Presence.Read Presence.Read.All"],
+    "scope": ["Presence.Read"],
     "endpoint": "https://graph.microsoft.com/beta/me/presence",
     "email": "yourEmail@provider.com",
     "sb_conn_string": "Endpoint=sb://bus-name.servicebus.windows.net/;SharedAccessKeyName=yourKeyName;SharedAccessKey=yourBigLongComplicatedKey;EntityPath=yourQueueName"

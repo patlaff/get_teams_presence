@@ -16,12 +16,12 @@ from sense_hat import SenseHat
 logging.basicConfig(filename='presence.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Import config
-config = json.load(open('config.json'))
+config = json.load(open('Azure/config.json'))
 
 # Sense Hat stuff:
 sense = SenseHat()
 sense.low_light = True
-timer = 56
+timer = 52
 start_time = time.time()
 elapsed_time = 0
 
