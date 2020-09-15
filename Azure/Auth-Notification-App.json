@@ -4,7 +4,7 @@
     "parameters": {
       "logicAppName": {
         "type": "string",
-        "defaultValue": "Lafferty-Notification-LogicApp",
+        "defaultValue": "Auth-Notification-App",
         "metadata": {
           "description": "Name of the Logic App."
         }
@@ -46,7 +46,7 @@
       },
       "owner_Tag": {
         "type": "string",
-        "defaultValue": "Patrick Lafferty"
+        "defaultValue": ""
       },
       "office365_name": {
         "type": "string",
@@ -54,7 +54,7 @@
       },
       "office365_displayName": {
         "type": "string",
-        "defaultValue": "patrick.lafferty@slalom.com"
+        "defaultValue": ""
       },
       "servicebus_name": {
         "type": "string",
@@ -62,11 +62,11 @@
       },
       "servicebus_displayName": {
         "type": "string",
-        "defaultValue": "Lafferty-Notification-Queue"
+        "defaultValue": "Auth-Notification-SB"
       },
       "servicebus_namespace_name": {
         "type": "string",
-        "defaultValue": "REPLACE__servicebus_namespace"
+        "defaultValue": "Auth-Notification-SB"
       },
       "servicebus_resourceGroupName": {
         "type": "string",

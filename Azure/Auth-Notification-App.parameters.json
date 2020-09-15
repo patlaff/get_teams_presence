@@ -1,0 +1,39 @@
+{
+    "$schema":  "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion":  "1.0.0.0",
+    "parameters":  {
+                       "logicAppName":  {
+                                            "value":  "Auth-Notification-LogicApp"
+                                        },
+                       "When_a_message_is_received_in_a_queue_(auto-complete)Frequency":  {
+                                                                                              "value":  "Minute"
+                                                                                          },
+                       "When_a_message_is_received_in_a_queue_(auto-complete)Interval":  {
+                                                                                             "value":  1
+                                                                                         },
+                       "owner_Tag":  {
+                                         "value":  "patlaff728@gmail.com"
+                                     },
+                       "office365_name":  {
+                                              "value":  "office365"
+                                          },
+                       "office365_displayName":  {
+                                                     "value":  "patlaff728@gmail.com"
+                                                 },
+                       "servicebus_name":  {
+                                               "value":  "servicebus"
+                                           },
+                       "servicebus_displayName":  {
+                                                      "value":  "Auth-Notification-Queue"
+                                                  },
+                       "servicebus_namespace_name":  {
+                                                         "value":  "Auth-Notification-Queue"
+                                                     },
+                       "servicebus_resourceGroupName":  {
+                                                            "value":  "Auth-Notification"
+                                                        },
+                       "servicebus_accessKey_name":  {
+                                                         "value":  "RootManageSharedAccessKey"
+                                                     }
+                   }
+}
