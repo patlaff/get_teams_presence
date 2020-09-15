@@ -5,7 +5,9 @@ $location = 'eastus'
 $RG_Name = 'Auth-Notification'
 $SB_Name = 'Auth-Notification-Queue'
 $Queue_Name = 'authqueue' #this value cannot be changed
-$LA_Template_Uri = 'https://raw.githubusercontent.com/patlaff/get_teams_presence/master/Azure/logicapp_template.json'
+$LA_Template_Uri = 'https://raw.githubusercontent.com/patlaff/get_teams_presence/master/Azure/Auth-Notification-App.json'
+
+$invocation = (Get-Variable MyInvocation).Value
 $param_file_path = ((Split-Path $invocation.MyCommand.Path) + '\Auth-Notification-App.parameters.json')
 
 Get-AzResourceGroup `
@@ -63,7 +65,6 @@ else
     Write-Host "Service Bus Queue, $Queue_Name, already exists on Namespace, $SB_Name, in Resource Group, $RG_Name."
 }
 
-$invocation = (Get-Variable MyInvocation).Value
 $parameter_json = Get-Content -Raw -Path $param_file_path | ConvertFrom-Json
 $parameter_json.parameters.owner_Tag.value = $account
 $parameter_json.parameters.office365_displayName.value = $account
