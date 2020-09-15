@@ -12,13 +12,13 @@
                                                                                              "value":  1
                                                                                          },
                        "owner_Tag":  {
-                                         "value":  "patlaff728@gmail.com"
+                                         "value":  ""
                                      },
                        "office365_name":  {
                                               "value":  "office365"
                                           },
                        "office365_displayName":  {
-                                                     "value":  "patlaff728@gmail.com"
+                                                     "value":  ""
                                                  },
                        "servicebus_name":  {
                                                "value":  "servicebus"
