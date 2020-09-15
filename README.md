@@ -14,7 +14,12 @@ This particular "do some action" is to scroll a message across the LCD screen on
 
     * Alternatively, if you don't plan on setting up Azure infrastructure for supplying an email notification, simply remove azure-servicebus from requirements.txt. It is not needed in this case.
 
-2. Create a config.json file with the following structure, filling in the empty attributes (if you don't plan on setting up Azure infrastructure, remove `email` and `sb_conn_string`):
+2. Register an AAD App, [using the steps outlined in this article](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#main)
+    * Save the Client ID for the next step
+    * Select "Mobile & Desktop Apps" under Platform Settings
+    * Navigate to the "API Permissions" blade, click "Add a permission", and under "Microsoft Graph", find and select "Presence.Read", then click "Add permissions"
+
+3. Create a config.json file with the following structure, filling in the empty attributes (if you don't plan on setting up Azure infrastructure, remove `email` and `sb_conn_string`):
 ```
 {
     "authority": "https://login.microsoftonline.com/common",
