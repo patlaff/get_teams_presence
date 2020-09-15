@@ -51,7 +51,7 @@ If the user needs a method of being notified of an expired or invalid auth token
 
 Templates for both of the required resources are included in this repo under the `Azure` folder. Configuration instructions are included further down this README.
 
-# Configuring Re-Authentication Notifications - 
+# Configuring Re-Authentication Notifications
 
 ## DIY Method:
 
@@ -83,13 +83,22 @@ Templates for both of the required resources are included in this repo under the
 5. [Add a Send Email v2 Action](https://docs.microsoft.com/en-us/connectors/office365/#send-an-email-(v2)), and configure the To, Subject, and Body fields to your liking using the parsed JSON from the above activity.
 
 ## AzureRM Template Method
-1. Run `Azure/deployment_script.ps1` from PowerShell
-2. Enter your Azure credentials (login window may open behind all other windows)
-3. This script will automatically create the following resources in your Azure subscription
+1. Install Azure Powershell with the following Powershell Script:
+```
+if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
+    Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
+      'Az modules installed at the same time is not supported.')
+} else {
+    Install-Module -Name Az -AllowClobber -Scope CurrentUser
+}
+```
+2. Run `Azure/deployment_script.ps1` from PowerShell
+3. Enter your Azure credentials (login window may open behind all other windows)
+4. This script will automatically create the following resources in your Azure subscription
     * An Azure Service Bus Namespace
     * A Queue on that Azure Service Bus named "authqueue"
     * An Azure Logic App, deployed with parameters specific to your account and the new Service Bus that was created
-4. Log into Azure, open the Logic App editor for the newly created Logic App, and ensure that all connections are valid
+5. Log into Azure, open the Logic App editor for the newly created Logic App, and ensure that all connections are valid
 
 # Built With
 * Python 3.7
