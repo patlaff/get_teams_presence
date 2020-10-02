@@ -7,3 +7,4 @@ include/
 lib/
 __pycache__/
 share/
+Azure/config.json

@@ -95,6 +95,11 @@ if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -List
     * An Azure Logic App, deployed with parameters specific to your account and the new Service Bus that was created
 5. Log into Azure, open the Logic App editor for the newly created Logic App, and ensure that all connections are valid
 
+# Sample crontab entry
+```
+* * * * * cd /home/pi/programs/GetTeamsPresence_console && /usr/bin/flock -n /tmp/presence.lockfile /home/pi/programs/GetTeamsPresence_console/bin/python3 /home/pi/programs/GetTeamsPresence_console/get_msgraph_presence.py
+```
+
 # Built With
 * Python 3.7
 

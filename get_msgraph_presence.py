@@ -87,9 +87,9 @@ if not result:
                 'The code %s has been copied to your clipboard, and your web browser is opening %s. '
                 'Paste the code to sign in.', flow['user_code'], flow['verification_uri']
             )
-
-    result = app.acquire_token_by_device_flow(flow) 
-
+    
+    result = app.acquire_token_by_device_flow(flow)
+        
 if 'access_token' in result:
     # Calling graph using the access token
     graph_data = requests.get(  # Use token to call downstream service
