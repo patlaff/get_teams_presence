@@ -8,3 +8,4 @@ lib/
 __pycache__/
 share/
 config.json
+Azure/config.json
