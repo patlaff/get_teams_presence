@@ -19,3 +19,12 @@ steps:
     py -m pip install --upgrade pip
     pip3 install -r requirements.txt
   displayName: 'Install dependencies'
+
+- task: AzureFileCopy@4
+  inputs:
+    SourcePath: '$(System.DefaultWorkingDirectory)/_patlaff_get_teams_presence/Azure'
+    azureSubscription: 'Philadelphia_InnovationLab (23e24950-8a7c-4cbd-a9a9-1edcf2029ff0)'
+    Destination: 'AzureBlob'
+    storage: 'slalomphillystorage'
+    ContainerName: 'cicd-test'
+    AdditionalArgumentsForBlobCopy: '/XO /S /Y'
