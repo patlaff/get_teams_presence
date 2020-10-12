@@ -27,4 +27,4 @@ steps:
     Destination: 'AzureBlob'
     storage: 'slalomphillystorage'
     ContainerName: 'cicd-test'
-    AdditionalArgumentsForBlobCopy: '/XO /S /Y'
+    #AdditionalArgumentsForBlobCopy: '/XO /S /Y'
