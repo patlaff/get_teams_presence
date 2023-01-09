@@ -1,0 +1,97 @@
+{
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "$connections": {
+            "defaultValue": {},
+            "type": "Object"
+        }
+    },
+    "triggers": {
+        "When_a_message_is_received_in_a_queue_(auto-complete)": {
+            "recurrence": {
+                "frequency": "Minute",
+                "interval": 1
+            },
+            "type": "ApiConnection",
+            "inputs": {
+                "host": {
+                    "connection": {
+                        "name": "@parameters('$connections')['servicebus']['connectionId']"
+                    }
+                },
+                "method": "get",
+                "path": "/@{encodeURIComponent(encodeURIComponent('authqueue'))}/messages/head",
+                "queries": {
+                    "queueType": "Main"
+                }
+            }
+        }
+    },
+    "actions": {
+        "Initialize_variable": {
+            "runAfter": {},
+            "type": "InitializeVariable",
+            "inputs": {
+                "variables": [
+                    {
+                        "name": "messageBody",
+                        "type": "string",
+                        "value": "@base64ToString(triggerBody()?['ContentData'])"
+                    }
+                ]
+            }
+        },
+        "Parse_JSON": {
+            "runAfter": {
+                "Initialize_variable": [
+                    "Succeeded"
+                ]
+            },
+            "type": "ParseJson",
+            "inputs": {
+                "content": "@variables('messageBody')",
+                "schema": {
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        },
+                        "user_code": {
+                            "type": "string"
+                        },
+                        "verification_uri": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            }
+        },
+        "Send_an_email_(V2)": {
+            "runAfter": {
+                "Parse_JSON": [
+                    "Succeeded"
+                ]
+            },
+            "type": "ApiConnection",
+            "inputs": {
+                "body": {
+                    "Body": "<p>@{body('Parse_JSON')?['message']}<br>\n<br>\n@{body('Parse_JSON')?['user_code']}<br>\n@{body('Parse_JSON')?['verification_uri']}</p>",
+                    "Subject": "Device Flow Authentication Token Refresh Needed",
+                    "To": "@body('Parse_JSON')?['email']"
+                },
+                "host": {
+                    "connection": {
+                        "name": "@parameters('$connections')['office365']['connectionId']"
+                    }
+                },
+                "method": "post",
+                "path": "/v2/Mail"
+            }
+        }
+    },
+    "outputs": {}
+}

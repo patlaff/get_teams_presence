@@ -1,0 +1,125 @@
+name: Get Teams Presence Terraform Pipeline
+run-name: Get Teams Presence Terraform ${{ inputs.terraform_action }} by ${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      # environment:
+      #   description: 'Environment to run deployments against'
+      #   type: environment
+      #   required: true                
+      #   default: 'development'
+      terraform_action:
+        description: 'The action terraform should apply'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+        required: true
+        default: 'plan'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  WORKING_DIR: terraform
+  ARM_USE_OIDC: true
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  STATE_STG_LOC: eastus2
+  TF_VERSION: 1.3.0
+
+jobs:
+  storage-acct:
+    name: "Create Storage Account if not exists"
+    runs-on: ubuntu-latest
+    # environment: ${{ inputs.build_env }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@main
+
+      - name: Read backend file
+        working-directory: ${{ env.WORKING_DIR }}
+        run: cat backends/backend.conf >> ${GITHUB_ENV}
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Check for Storage Account
+        run: az storage account show --resource-group ${{env.resource_group_name}} --name ${{env.storage_account_name}} || echo "CREATE_STG=1" >> $GITHUB_ENV
+
+      - name: Create State Storage Account
+        if: ${{ env.CREATE_STG == 1 }}
+        run: |
+          az group create --location ${{env.STATE_STG_LOC}} --name ${{env.resource_group_name}}
+          az storage account create --name ${{env.storage_account_name}} --location ${{env.STATE_STG_LOC}} --resource-group ${{env.resource_group_name}} --sku Standard_LRS
+          az storage container create --name ${{env.container_name}} --account-name ${{env.storage_account_name}}
+  
+  
+  terraform:
+
+    name: "Terraform Build"
+    needs: [storage-acct]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@main
+
+      - name: Read backend file
+        working-directory: ${{ env.WORKING_DIR }}
+        run: cat backends/${{ inputs.build_env }}.conf >> ${GITHUB_ENV}
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform init -backend-config=backends/backend.conf
+
+      - name: Terraform Validate
+        id: validate
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform validate -no-color
+
+      - name: Terraform Plan Apply
+        id: plan-apply
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform plan -var-file=vars/${{ inputs.build_env }}.tfvars -no-color -out=plan.out && terraform show -json plan.out > level4.json
+
+      - name: Terraform Apply
+        id: apply
+        working-directory: ${{ env.WORKING_DIR }}
+        if: inputs.tf_action == 'apply'
+        run: terraform apply -var-file=vars/${{ inputs.build_env }}.tfvars -auto-approve
+
+      - name: Terraform Plan Destroy
+        id: plan-destroy
+        working-directory: ${{ env.WORKING_DIR }}
+        if: inputs.tf_action == 'destroy'
+        run: terraform plan -destroy -var-file=vars/${{ inputs.build_env }}.tfvars -no-color
+
+      - name: Terraform Destroy
+        id: destroy
+        working-directory: ${{ env.WORKING_DIR }}
+        if: inputs.tf_action == 'destroy'
+        run: terraform destroy -var-file=vars/${{ inputs.build_env }}.tfvars -auto-approve
